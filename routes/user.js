@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const verify = require("../routes/verifyToken");
 
 //register 
-router.post("/register", verify, async  (req,res) => {
+router.post("/register", async  (req,res) => {
     // checking user id in DB
     const emailExists = await User.findOne({
         email: req.body.email
@@ -32,8 +32,9 @@ router.post("/register", verify, async  (req,res) => {
     }
 });
 
+
 // user login
-router.get("/login", async (req,res)=>{
+router.post("/login", async (req,res)=>{
     // checking user email in db
     const user = await User.findOne({email: req.body.email})
 
@@ -46,5 +47,27 @@ router.get("/login", async (req,res)=>{
     const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
     res.header("auth-token",token).send({token:token});
 });
+
+
+// get all the registered users
+router.get("/getusers",verify,async (req,res) =>{
+    try{
+        const users = await User.find();
+        res.json(users);
+    } catch(error) {
+        res.json({ message: error })
+    }
+});
+
+// get specific user by id
+router.get("/getusers/:userId",verify, async (req, res) => {
+    try {
+      const user = await User.findById(req.params.userId);
+      res.json(user);
+    } catch (error) {
+        console.log("ma hu kunal");
+      res.json({ message: error });
+    }
+  });
 
 module.exports = router;
